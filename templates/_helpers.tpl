@@ -76,20 +76,6 @@ Selector labels
 - name: "N8N_CONFIG_FILES"
   value: {{ include "n8n.configFiles" . | quote }}
 {{ end }}
-{{- if .Values.scaling.enabled }}
-- name: "QUEUE_BULL_REDIS_HOST"
-  {{- if .Values.scaling.redis.host }}
-  value: "{{ .Values.scaling.redis.host }}"
-  {{ else }}
-  value: "{{ .Release.Name }}-redis-master"
-  {{ end }}  
-- name: "EXECUTIONS_MODE"
-  value: "queue"
-{{ end }}
-{{- if .Values.scaling.redis.password }}
-- name: "QUEUE_BULL_REDIS_PASSWORD"
-  value: "{{ .Values.scaling.redis.password }}"
-{{ end }}
 {{- if .Values.scaling.webhook.enabled }}
 - name: "N8N_DISABLE_PRODUCTION_MAIN_PROCESS"
   value: "true"
@@ -125,15 +111,3 @@ Create the name of the service account to use
 {{- end }}
 
 
-{{/* PVC existing, emptyDir, Dynamic */}}
-{{- define "n8n.pvc" -}}
-{{- if or (not .Values.persistence.enabled) (eq .Values.persistence.type "emptyDir") -}}
-          emptyDir: {}
-{{- else if and .Values.persistence.enabled .Values.persistence.existingClaim -}}
-          persistentVolumeClaim:
-            claimName: {{ .Values.persistence.existingClaim }}
-{{- else if and .Values.persistence.enabled (eq .Values.persistence.type "dynamic")  -}}
-          persistentVolumeClaim:
-            claimName: {{ include "n8n.fullname" . }}
-{{- end }}
-{{- end }}

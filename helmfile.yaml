@@ -23,8 +23,6 @@ releases:
           encryption_key: {{ .Values.encryption_key }}
       - config:
           host: {{ .Values.domain }}
-      - persistence:
-          enabled: true
-          type: dynamic
+
 
 
